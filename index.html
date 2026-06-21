@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraGen // AI Image Generator</title>
+    <meta name="description" content="Generate stunning AI imagery powered by advanced text-to-image models with AuraGen.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Toast Notification Area -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Sidebar Settings -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-accent">Aura</span><span>Gen</span>
+                </div>
+                <span class="logo-version">v1.2</span>
+            </div>
+
+            <div class="sidebar-scroll">
+                <!-- Model Section -->
+                <div class="setting-group">
+                    <label class="setting-label">AI Model</label>
+                    <div class="model-select-wrapper">
+                        <select id="model-select" class="custom-select">
+                            <option value="flux" selected>Flux (Balanced & Fast)</option>
+                            <option value="flux-realism">Flux Realism (Photorealistic)</option>
+                            <option value="flux-anime">Flux Anime (Manga & Anime)</option>
+                            <option value="flux-3d">Flux 3D (CGI & Game Engine)</option>
+                            <option value="any">Standard Diffusion (Creative/Turbo)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Aspect Ratio Section -->
+                <div class="setting-group">
+                    <label class="setting-label">Aspect Ratio</label>
+                    <div class="aspect-grid">
+                        <button type="button" class="aspect-card active" data-ratio="1:1" data-width="1024" data-height="1024">
+                            <div class="aspect-preview ratio-1-1"></div>
+                            <span class="aspect-name">1:1 Square</span>
+                            <span class="aspect-dims">1024x1024</span>
+                        </button>
+                        <button type="button" class="aspect-card" data-ratio="16:9" data-width="1344" data-height="768">
+                            <div class="aspect-preview ratio-16-9"></div>
+                            <span class="aspect-name">16:9 Wide</span>
+                            <span class="aspect-dims">1344x768</span>
+                        </button>
+                        <button type="button" class="aspect-card" data-ratio="9:16" data-width="768" data-height="1344">
+                            <div class="aspect-preview ratio-9-16"></div>
+                            <span class="aspect-name">9:16 Tall</span>
+                            <span class="aspect-dims">768x1344</span>
+                        </button>
+                        <button type="button" class="aspect-card" data-ratio="4:3" data-width="1024" data-height="768">
+                            <div class="aspect-preview ratio-4-3"></div>
+                            <span class="aspect-name">4:3 Photo</span>
+                            <span class="aspect-dims">1024x768</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Seed Configuration -->
+                <div class="setting-group">
+                    <div class="setting-header-inline">
+                        <label class="setting-label">Seed Settings</label>
+                        <button type="button" id="randomize-seed-btn" class="text-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            Randomize
+                        </button>
+                    </div>
+                    <div class="seed-input-container">
+                        <input type="text" id="seed-input" class="custom-input" placeholder="Randomized" readonly>
+                        <button type="button" id="lock-seed-btn" class="seed-lock-btn" title="Lock seed to recreate style">
+                            <svg class="lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prompt Helper Enhancer Toggle -->
+                <div class="setting-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="enhance-prompt-chk" checked>
+                        <span class="checkmark"></span>
+                        <div class="checkbox-text">
+                            <span class="checkbox-title">Auto-Enhance Prompt</span>
+                            <span class="checkbox-desc">Appends cinematic terms, lighting adjustments, and quality tags.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <p>Powered by Pollinations AI</p>
+                <div class="api-status">
+                    <span class="status-indicator online"></span>
+                    <span>API Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Top bar / Hero -->
+            <header class="main-header">
+                <h1>Create Beyond Imagination</h1>
+                <p>Describe your vision, choose a model, and watch the art materialize instantly.</p>
+            </header>
+
+            <!-- Generator Control Center -->
+            <section class="prompt-box-section">
+                <div class="prompt-container">
+                    <textarea id="prompt-textarea" class="prompt-textarea" placeholder="A futuristic cybernetic city floating in the clouds, neon lights reflecting on wet metallic structures, cinematic lighting, 8k resolution..."></textarea>
+                    
+                    <div class="prompt-actions">
+                        <button type="button" id="surprise-btn" class="action-btn secondary" title="Random prompt idea">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                            Surprise Me
+                        </button>
+                        
+                        <button type="button" id="generate-btn" class="action-btn primary">
+                            <span>Materialize</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sparkle-icon"><path d="M12 3v3M12 18v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M6.34 17.66l2.12-2.12M15.54 8.46l2.12-2.12"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Generation Display & Preview -->
+            <section class="display-section">
+                <div class="preview-card">
+                    <div id="image-display-container" class="image-display-container">
+                        <!-- Initial State -->
+                        <div id="display-placeholder" class="display-placeholder">
+                            <div class="placeholder-icon">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </div>
+                            <h3>Enter a prompt and click Materialize</h3>
+                            <p>Select your preferred model and aspect ratio in the sidebar configuration.</p>
+                            <div class="preset-suggestions">
+                                <button type="button" class="preset-tag">Cyberpunk Samurai</button>
+                                <button type="button" class="preset-tag">Cosmic Nebulae Portal</button>
+                                <button type="button" class="preset-tag">Lofi Study Room</button>
+                            </div>
+                        </div>
+
+                        <!-- Loading State (hidden initially) -->
+                        <div id="display-loading" class="display-loading hidden">
+                            <div class="glowing-spinner"></div>
+                            <div class="loading-status-container">
+                                <p class="loading-title">Synthesizing Aura...</p>
+                                <p class="loading-subtitle">Contacting neural weights & structuring pixels</p>
+                            </div>
+                            <!-- Skeleton preview loader -->
+                            <div class="skeleton-ratio-container" id="skeleton-box"></div>
+                        </div>
+
+                        <!-- Result State (hidden initially) -->
+                        <div id="display-result" class="display-result hidden">
+                            <img id="generated-img" class="generated-img" src="" alt="AI Generated Image">
+                            
+                            <div class="image-overlay">
+                                <div class="overlay-top">
+                                    <span class="badge" id="badge-model">Flux</span>
+                                    <span class="badge" id="badge-ratio">1:1</span>
+                                </div>
+                                <div class="overlay-actions">
+                                    <button type="button" id="copy-url-btn" class="overlay-btn" title="Copy Image URL">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                    </button>
+                                    <button type="button" id="favorite-btn" class="overlay-btn" title="Save to Gallery">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="favorite-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                    </button>
+                                    <button type="button" id="download-btn" class="overlay-btn" title="Download Image">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gallery / History Section -->
+            <section class="gallery-section">
+                <div class="gallery-header">
+                    <h2>Your Aura Gallery</h2>
+                    <button type="button" id="clear-gallery-btn" class="text-btn danger-hover">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        Clear All
+                    </button>
+                </div>
+                <div id="gallery-grid" class="gallery-grid">
+                    <!-- Gallery elements will be populated here by javascript -->
+                    <div class="gallery-empty-state" id="gallery-empty-state">
+                        <p>No generated images yet. Create your first artwork to see it here!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Details View Modal -->
+    <div id="detail-modal" class="modal hidden">
+        <div class="modal-overlay" id="modal-overlay"></div>
+        <div class="modal-container">
+            <button type="button" class="modal-close-btn" id="modal-close-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="modal-content">
+                <div class="modal-image-panel">
+                    <img id="modal-img" src="" alt="Aura Generated Artwork">
+                </div>
+                <div class="modal-info-panel">
+                    <h2>Creation Metadata</h2>
+                    <div class="modal-scroll-area">
+                        <div class="meta-field">
+                            <span class="meta-label">Prompt</span>
+                            <p class="meta-value-box" id="modal-prompt-text"></p>
+                            <button type="button" id="modal-copy-prompt" class="small-action-btn">Copy Prompt</button>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-field half">
+                                <span class="meta-label">AI Model</span>
+                                <span class="meta-val" id="modal-model-val">-</span>
+                            </div>
+                            <div class="meta-field half">
+                                <span class="meta-label">Aspect Ratio</span>
+                                <span class="meta-val" id="modal-ratio-val">-</span>
+                            </div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-field half">
+                                <span class="meta-label">Seed</span>
+                                <span class="meta-val monospace" id="modal-seed-val">-</span>
+                            </div>
+                            <div class="meta-field half">
+                                <span class="meta-label">Dimensions</span>
+                                <span class="meta-val" id="modal-dims-val">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-actions-footer">
+                        <button type="button" id="modal-reuse-btn" class="action-btn secondary">Reuse Parameters</button>
+                        <a id="modal-download-btn" class="action-btn primary" href="#" download="auragen-art.jpg">Download Image</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Entry -->
+    <script src="main.js"></script>
+</body>
+</html>
