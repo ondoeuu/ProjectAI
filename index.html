@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI eGov Agent | Snadné založení firmy</title>
+    <!-- Modern Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Background Animated Shapes -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+
+    <main class="app-container">
+        <!-- Logo Header -->
+        <header class="app-header fade-in">
+            <div class="logo">
+                <i class="fa-solid fa-layer-group"></i> eGov AI Agent
+            </div>
+        </header>
+
+        <!-- KROK 1: Identifikace (BankID Mock) -->
+        <section id="step-identity" class="step active slide-up">
+            <div class="glass-card text-center identity-card">
+                <h1 class="title">Založte firmu<br>bez byrokracie</h1>
+                <p class="subtitle">Přihlaste se a nechte AI vyřídit papírování za vás. Princip <i>once-only</i> v praxi.</p>
+                <button id="btn-login" class="primary-btn pulse-anim">
+                    <i class="fa-solid fa-fingerprint"></i> Přihlásit přes Bankovní Identitu
+                </button>
+            </div>
+        </section>
+
+        <!-- KROK 2: Vstup Záměru (Intent) -->
+        <section id="step-intent" class="step hidden">
+            <div class="glass-card text-center">
+                <div class="user-welcome fade-in">
+                    <img src="https://ui-avatars.com/api/?name=Jan+Novak&background=3b82f6&color=fff&rounded=true" alt="User Avatar" class="avatar">
+                    <h2>Vítejte, Jane.</h2>
+                    <p>Ověřili jsme vás přes Bankovní Identitu.</p>
+                </div>
+                
+                <h1 class="title slide-up" style="animation-delay: 0.2s">Co máte v plánu?</h1>
+                <p class="subtitle slide-up" style="animation-delay: 0.3s">Napište jednou větou, jakou firmu chcete otevřít a já zařídím zbytek.</p>
+                
+                <div class="input-wrapper slide-up" style="animation-delay: 0.4s">
+                    <i class="fa-solid fa-wand-magic-sparkles magic-icon"></i>
+                    <input type="text" id="input-intent" placeholder="Např.: Chci založit softwarovou firmu Inovace s.r.o." autocomplete="off">
+                    <button id="btn-submit-intent" class="submit-btn"><i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+                <div class="suggestions fade-in" style="animation-delay: 0.6s">
+                    <span class="suggestion-chip" onclick="document.getElementById('input-intent').value = this.innerText">Založit vývojářskou firmu Inovace s.r.o.</span>
+                    <span class="suggestion-chip" onclick="document.getElementById('input-intent').value = this.innerText">Chci otevřít kavárnu Kofíčko v Brně</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- KROK 3: AI Magie (Loading) -->
+        <section id="step-processing" class="step hidden">
+            <div class="glass-card loading-card text-center">
+                <div class="ai-brain-loader">
+                    <div class="core"></div>
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                </div>
+                <h2 class="title" style="margin-top: 2rem;">Umělá inteligence pracuje...</h2>
+                
+                <ul class="processing-steps">
+                    <li id="proc-1" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Hledám v Registru obyvatel...</li>
+                    <li id="proc-2" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Ověřuji dostupnost názvu v ARES...</li>
+                    <li id="proc-3" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzuji platnou legislativu pro vybraný obor...</li>
+                    <li id="proc-4" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Generuji podklad k založení a seznam povinností...</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- KROK 4: Proposal (Potvrzení) -->
+        <section id="step-proposal" class="step hidden">
+            <div class="glass-card proposal-card slide-up">
+                <div class="proposal-header">
+                    <h2><i class="fa-solid fa-check-circle text-success"></i> Návrh připraven ke schválení</h2>
+                    <p class="explanation" id="prop-explanation">Všechny dostupné registry byly zkontrolovány...</p>
+                </div>
+
+                <div class="proposal-grid">
+                    <div class="prop-section info-section">
+                        <h3><i class="fa-solid fa-building"></i> Základní údaje</h3>
+                        <ul>
+                            <li><strong>Zakladatel:</strong> Jan Novák</li>
+                            <li><strong>Název firmy:</strong> <span id="prop-company-name">Inovace s.r.o.</span></li>
+                            <li><strong>Obor:</strong> <span id="prop-business-area">Vývoj software</span></li>
+                            <li><strong>Dostupnost názvu:</strong> <span class="badge success">Volné</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="prop-section req-section">
+                        <h3><i class="fa-solid fa-gavel"></i> Požadavky a Legislativa</h3>
+                        <ul id="prop-requirements" class="req-list">
+                            <!-- Dynamic content -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="prop-section duties-section">
+                    <h3><i class="fa-solid fa-calendar-check"></i> Okamžité povinnosti (Tier 1 AI hlídání)</h3>
+                    <div class="duties-grid" id="prop-duties">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <div class="proposal-actions">
+                    <button class="secondary-btn" id="btn-cancel">Zrušit</button>
+                    <button class="primary-btn pulse-anim" id="btn-confirm">Schválit a Založit elektronicky</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Zpráva o úspěchu -->
+        <section id="step-success" class="step hidden">
+            <div class="glass-card text-center success-card slide-up">
+                <div class="success-icon-wrapper">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h1 class="title">Úspěšně odesláno!</h1>
+                <p class="subtitle">Váš návrh byl podán na příslušné úřady. Náš agent automaticky naplánoval dlouhodobé povinnosti do vašeho kalendáře.</p>
+                <div class="scheduled-duties" id="success-scheduled">
+                    <!-- Dynamic tasks -->
+                </div>
+                <button class="primary-btn mt-2" onclick="location.reload()"><i class="fa-solid fa-house"></i> Zpět na úvod</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
