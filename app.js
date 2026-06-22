@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stepIntent = document.getElementById('step-intent');
     const stepProcessing = document.getElementById('step-processing');
     const stepProposal = document.getElementById('step-proposal');
+    const stepSubscription = document.getElementById('step-subscription');
     const stepDashboard = document.getElementById('step-dashboard');
 
     const btnLogin = document.getElementById('btn-login');
@@ -238,23 +239,35 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = 'Ověřit';
     });
 
-    // 5. Potvrzení -> Uložení DB -> Načtení Dashboardu
-    btnConfirm.addEventListener('click', async () => {
-        btnConfirm.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Zakládám firmu a aktivuji monitoring...';
-        try {
-            // Uloží firmu do DB
-            const res = await fetch('/api/companies', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(currentProposal)
-            });
-            const data = await res.json();
+    // 5. Potvrzení Návrhu -> Výběr Předplatného
+    btnConfirm.addEventListener('click', () => {
+        showStep(stepSubscription);
+    });
+
+    // 5.5 Výběr Předplatného -> Uložení DB -> Načtení Dashboardu
+    document.querySelectorAll('.btn-plan').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const plan = e.currentTarget.dataset.plan;
+            currentProposal.plan = plan; // Uložíme zvolený plán
             
-            // Okamžitě načte novou firmu a ukáže dashboard
-            await loadCompanyDashboard(data.company_id);
-        } catch (e) {
-            console.error(e);
-        }
+            const originalHtml = e.currentTarget.innerHTML;
+            e.currentTarget.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Zakládám...';
+            e.currentTarget.disabled = true;
+            
+            try {
+                const res = await fetch('/api/companies', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentProposal)
+                });
+                const data = await res.json();
+                await loadCompanyDashboard(data.company_id);
+            } catch (e) {
+                console.error(e);
+                e.currentTarget.innerHTML = originalHtml;
+                e.currentTarget.disabled = false;
+            }
+        });
     });
 
     btnCancel.addEventListener('click', () => {
@@ -321,6 +334,46 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(taskDiv);
         });
     }
+
+    // Tlačítko pro simulaci posunu času
+    document.getElementById('btn-simulate').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const origHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Simuluji...';
+        
+        try {
+            const types = ["new_law", "deadline"];
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            
+            // Reload company to get latest state
+            const cRes = await fetch(`/api/companies`);
+            const companies = await cRes.json();
+            const latestCompany = companies[companies.length - 1]; // We take the last created company
+
+            const res = await fetch('/api/simulate-event', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ company_id: latestCompany.id, event_type: randomType })
+            });
+            const data = await res.json();
+            
+            if(data.status === 'success') {
+                // Překreslíme tasky
+                const updatedRes = await fetch(`/api/companies/${latestCompany.id}`);
+                const updatedCompany = await updatedRes.json();
+                renderTasks(updatedCompany.tasks);
+                
+                // Zvýšíme counter alertů
+                const countEl = document.getElementById('dash-alerts-count');
+                countEl.innerText = parseInt(countEl.innerText) + 1;
+                document.getElementById('dash-alerts-pill').style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+                document.getElementById('dash-alerts-pill').style.color = 'var(--danger)';
+            }
+        } catch(e) {
+            console.error(e);
+        }
+        btn.innerHTML = origHtml;
+    });
 
     // Globální funkce pro zavolání z inline onclick
     window.executeTask = async function(taskId, btnElement) {

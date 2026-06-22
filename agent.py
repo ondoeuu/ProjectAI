@@ -481,4 +481,4 @@ app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 if __name__ == "__main__":
     print("Startuji FastAPI server s DB...")
-    uvicorn.run(app, host="0.0.0.0", port=8091)
+    uvicorn.run(app, host="0.0.0.0", port=8092)

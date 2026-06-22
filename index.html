@@ -168,6 +168,46 @@
             </div>
         </section>
         
+        <!-- KROK 4.5: Výběr předplatného -->
+        <section id="step-subscription" class="step hidden">
+            <div class="glass-card subscription-card slide-up">
+                <div class="text-center" style="margin-bottom: 2rem;">
+                    <h2><i class="fa-solid fa-credit-card"></i> Vyberte si tarif služeb</h2>
+                    <p class="explanation">Založení máte od nás zdarma. Chcete pomoci i s průběžnou agendou?</p>
+                </div>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Základ</h3>
+                        <div class="price">Zdarma</div>
+                        <p class="desc">Jednorázové založení firmy</p>
+                        <ul class="features">
+                            <li><i class="fa-solid fa-check text-success"></i> Zápis do OR zdarma</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Ohlášení živnosti</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Základní výpis povinností</li>
+                            <li class="disabled"><i class="fa-solid fa-xmark"></i> Průběžný monitoring registrů</li>
+                            <li class="disabled"><i class="fa-solid fa-xmark"></i> Notifikace o legislativě</li>
+                            <li class="disabled"><i class="fa-solid fa-xmark"></i> Přístup pro účetní</li>
+                        </ul>
+                        <button class="secondary-btn btn-plan" data-plan="free" style="width: 100%; justify-content: center; margin-top: 1rem;">Zvolit Základ</button>
+                    </div>
+                    <div class="pricing-card premium">
+                        <div class="popular-badge">Doporučeno</div>
+                        <h3>Hlídací pes</h3>
+                        <div class="price">299 Kč <span>/ měsíc</span></div>
+                        <p class="desc">Chytrý AI monitoring agendy</p>
+                        <ul class="features">
+                            <li><i class="fa-solid fa-check text-success"></i> Zápis do OR zdarma</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Průběžný monitoring (ARES, ISIR...)</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Automatické upozornění na změny</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Hlídání termínů daňových přiznání</li>
+                            <li><i class="fa-solid fa-check text-success"></i> Klientská zóna s přístupem pro účetní</li>
+                        </ul>
+                        <button class="primary-btn btn-plan" data-plan="premium" style="width: 100%; justify-content: center; margin-top: 1rem;">Aktivovat Hlídacího Psa</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
         <!-- KROK 5: Dashboard (Monitoring po založení) -->
         <section id="step-dashboard" class="step hidden">
             <div class="dashboard-wrapper slide-up">
@@ -184,18 +224,21 @@
                                 <p class="dash-ico">IČO: <span id="dash-ico">12345678</span></p>
                             </div>
                         </div>
-                        <div class="dashboard-hero-right">
-                            <div class="stat-pill">
-                                <i class="fa-solid fa-satellite-dish"></i>
-                                <span><strong>7</strong> sledovaných registrů</span>
-                            </div>
-                            <div class="stat-pill alerts" id="dash-alerts-pill">
-                                <i class="fa-solid fa-bell"></i>
-                                <span><strong id="dash-alerts-count">0</strong> upozornění</span>
-                            </div>
-                            <div class="stat-pill">
-                                <i class="fa-solid fa-clock"></i>
-                                <span>Scan: <span id="dash-last-scan">--</span></span>
+                        <div class="dashboard-hero-right" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button class="secondary-btn" id="btn-simulate" style="padding: 0.5rem 1rem; font-size: 0.85rem; width: 100%; justify-content: center;"><i class="fa-solid fa-clock-rotate-left"></i> Simulovat Posun Času</button>
+                            <div style="display: flex; gap: 1rem; align-items: center; justify-content: flex-end;">
+                                <div class="stat-pill">
+                                    <i class="fa-solid fa-satellite-dish"></i>
+                                    <span><strong>7</strong> sledovaných registrů</span>
+                                </div>
+                                <div class="stat-pill alerts" id="dash-alerts-pill">
+                                    <i class="fa-solid fa-bell"></i>
+                                    <span><strong id="dash-alerts-count">0</strong> upozornění</span>
+                                </div>
+                                <div class="stat-pill">
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span>Scan: <span id="dash-last-scan">--</span></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -222,6 +265,22 @@
                     </h2>
                     <div class="limits-grid" id="dash-limits">
                         <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Tým a Účetní -->
+                <div class="dashboard-section" id="dashboard-team" style="margin-bottom: 2.5rem;">
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-users"></i>
+                        Tým a Účetní
+                        <span class="section-subtitle">Nasdílejte přístup a delegujte starosti</span>
+                    </h2>
+                    <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem;">
+                        <div>
+                            <h4 style="margin-bottom: 0.5rem;">Přístup pro účetní firmu</h4>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0;">Účetní dostane přístup k notifikacím a výpisům ze sbírky listin. Bude řešit vybrané úkoly za vás.</p>
+                        </div>
+                        <button class="primary-btn" onclick="alert('Pozvánka odeslána. Účetní AI jim nyní bude automaticky přeposílat relevantní povinnosti k vyřešení.')" style="padding: 0.5rem 1.5rem; font-size: 0.95rem;"><i class="fa-solid fa-user-plus"></i> Pozvat účetní</button>
                     </div>
                 </div>
 
