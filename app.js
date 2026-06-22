@@ -64,29 +64,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     });
 
-    // 2. Intent -> Processing -> Proposal
-    function processIntent() {
+    // 2. Intent -> Processing -> API Call -> Proposal
+    async function processIntent() {
         const intentVal = inputIntent.value.trim();
         if(!intentVal) return; // Nedovolit prázdný submit
 
-        // Zkusíme extrahovat jméno z textu pro hezčí demo
-        if (intentVal.includes("Kofíčko")) {
-            mockProposal.company_name = "Kofíčko s.r.o.";
-            mockProposal.business_area = "Hostinská činnost";
-            mockProposal.requirements = [{
-                title: "Doložení odborné způsobilosti",
-                description: "Pro obor Hostinská činnost (řemeslná živnost) legislativa vyžaduje doložení praxe nebo vzdělání v oboru."
-            }];
-        } else if (intentVal.match(/([A-Z][a-z]+ s\.r\.o\.)/)) {
-            const match = intentVal.match(/([A-Z][a-z]+ s\.r\.o\.)/);
-            mockProposal.company_name = match[1];
-        } else if (intentVal.length > 5) {
-             mockProposal.company_name = "Nová firma s.r.o.";
-             mockProposal.business_area = "Volná živnost";
-        }
-
         showStep(stepProcessing);
+        
+        // Spustíme animaci UI
         runAIProcessing();
+        
+        try {
+            // Odeslání dat na FastAPI backend
+            const response = await fetch('/api/onboard', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ intent_text: intentVal })
+            });
+            
+            if (!response.ok) {
+                throw new Error("Server error");
+            }
+            
+            const proposalData = await response.json();
+            
+            // Uložíme data do globální mock proměnné pro Success screen
+            Object.assign(mockProposal, proposalData);
+            
+            // UI animace má fixní delay, aby si uživatel "užil" AI Loader. 
+            // V reálu můžeme počkat, až se oboje (fetch i animace) dokončí.
+        } catch (error) {
+            console.error("Chyba při komunikaci s API:", error);
+            alert("Došlo k chybě připojení k serveru. Běží FastAPI?");
+        }
     }
 
     btnSubmitIntent.addEventListener('click', processIntent);
