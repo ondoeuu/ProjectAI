@@ -124,17 +124,19 @@ Struktura: {{"company_name": "...", "business_area": "..."}}
 Text uživatele: "{intent_text}"
             """
             response = model.generate_content(prompt)
-            raw_text = response.text.replace('```json', '').replace('```', '').strip()
-            data = json.loads(raw_text)
-            
-            if "company_name" in data and "business_area" in data:
-                return {
-                    "founder_id": founder_id,
-                    "company_name": data["company_name"],
-                    "business_area": data["business_area"],
-                    "expected_turnover": 1500000.0,
-                    "company_type": "s.r.o."
-                }
+            match = re.search(r'\{.*\}', response.text, re.DOTALL)
+            if match:
+                raw_text = match.group(0)
+                data = json.loads(raw_text)
+                
+                if "company_name" in data and "business_area" in data:
+                    return {
+                        "founder_id": founder_id,
+                        "company_name": data["company_name"],
+                        "business_area": data["business_area"],
+                        "expected_turnover": 1500000.0,
+                        "company_type": "s.r.o."
+                    }
         except Exception as e:
             print(f"Gemini API Error: {e}")
 
@@ -269,11 +271,12 @@ class TierOneAgent:
         
         proposal.scheduled_duties = self.schedule_public_duties(founder_id, {"type": "s.r.o."})
 
-        proposal.status = "READY_FOR_REVIEW"
-        proposal.explanation = (
-            f"Všechny dostupné registry byly zkontrolovány (ARES, ROS, ISIR, DPH, VIES). Název firmy '{intent.company_name}' je volný. "
-            f"Připravil jsem návrh na založení a seznam povinných podkladů i okamžitých povinností po zápisu do OR."
-        )
+        if proposal.status == "DRAFT":
+            proposal.status = "READY_FOR_REVIEW"
+            proposal.explanation = (
+                f"Všechny dostupné registry byly zkontrolovány (ARES, ROS, ISIR, DPH, VIES). Název firmy '{intent.company_name}' je volný. "
+                f"Připravil jsem návrh na založení a seznam povinných podkladů i okamžitých povinností po zápisu do OR."
+            )
 
         return proposal
 
@@ -478,4 +481,4 @@ app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 if __name__ == "__main__":
     print("Startuji FastAPI server s DB...")
-    uvicorn.run(app, host="0.0.0.0", port=8089)
+    uvicorn.run(app, host="0.0.0.0", port=8091)

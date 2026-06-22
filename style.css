@@ -233,6 +233,22 @@ button {
     background: rgba(255, 255, 255, 0.15);
 }
 
+.btn-recheck {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-recheck:hover {
+    background: var(--primary-hover);
+}
+
 /* Steps logic */
 .step {
     display: none;
