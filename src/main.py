@@ -26,4 +26,4 @@ def root():
 if __name__ == "__main__":
     import uvicorn
     # Pro lokální vývoj spustíme uvicorn přímo
-    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8080, reload=True)
