@@ -178,17 +178,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const reqContainer = document.getElementById('prop-requirements');
         reqContainer.innerHTML = '';
         data.requirements.forEach(req => {
-            reqContainer.innerHTML += `<li class="req-item"><h4>${req.title}</h4><p>${req.description}</p></li>`;
+            const aiBadge = req.ai_detected ? `<span class="badge ai-badge" style="margin-left: 0.5rem; background: rgba(56, 189, 248, 0.2); color: var(--primary); border: 1px solid var(--primary);"><i class="fa-solid fa-wand-magic-sparkles"></i> Odhaleno AI</span>` : '';
+            const sourceInfo = req.source_law ? `<p style="font-size: 0.8rem; color: var(--primary); margin-top: 0.5rem;"><i class="fa-solid fa-scale-balanced"></i> Zdroj: ${req.source_law}</p>` : '';
+            reqContainer.innerHTML += `<li class="req-item"><h4>${req.title} ${aiBadge}</h4><p>${req.description}</p>${sourceInfo}</li>`;
         });
 
         const dutiesContainer = document.getElementById('prop-duties');
         dutiesContainer.innerHTML = '';
         data.immediate_duties.forEach(duty => {
+            const aiBadge = duty.ai_detected ? `<span class="badge ai-badge" style="margin-left: 0.5rem; background: rgba(56, 189, 248, 0.2); color: var(--primary); border: 1px solid var(--primary);"><i class="fa-solid fa-wand-magic-sparkles"></i> Odhaleno AI</span>` : '';
+            const sourceInfo = duty.source_law ? `<p style="font-size: 0.8rem; color: var(--primary); margin-top: 0.5rem;"><i class="fa-solid fa-scale-balanced"></i> Zdroj: ${duty.source_law}</p>` : '';
             dutiesContainer.innerHTML += `
                 <div class="duty-card">
-                    <h4>${duty.title}</h4>
+                    <h4>${duty.title} ${aiBadge}</h4>
                     <p>${duty.description}</p>
                     <span class="deadline"><i class="fa-regular fa-clock"></i> ${duty.deadline}</span>
+                    ${sourceInfo}
                 </div>`;
         });
     }
@@ -196,6 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateBadgeStatus(isAvailable) {
         const badge = document.getElementById('prop-name-status');
         const confirmBtn = document.getElementById('btn-confirm');
+        const chk = document.getElementById('chk-responsibility');
+        
         if (!isAvailable) {
             badge.className = "badge danger";
             badge.innerText = "Obsazené";
@@ -205,9 +212,26 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             badge.className = "badge success";
             badge.innerText = "Volné";
-            confirmBtn.disabled = false;
-            confirmBtn.style.opacity = "1";
             confirmBtn.innerText = "Schválit a Založit elektronicky";
+            
+            // Checkbox logic
+            if (chk.checked) {
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = "1";
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.style.opacity = "0.5";
+            }
+            
+            chk.addEventListener('change', () => {
+                if (chk.checked) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = "1";
+                } else {
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.opacity = "0.5";
+                }
+            });
         }
     }
 
@@ -321,11 +345,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </button>` : 
                     `<span style="color: var(--text-muted);"><i class="fa-solid fa-person-digging"></i> Vyžaduje vaši součinnost</span>`);
 
+            const aiBadge = t.ai_detected ? `<span class="badge ai-badge" style="margin-left: 0.5rem; background: rgba(56, 189, 248, 0.2); color: var(--primary); border: 1px solid var(--primary);"><i class="fa-solid fa-wand-magic-sparkles"></i> Odhaleno AI</span>` : '';
+            const sourceInfo = t.source_law ? `<p style="font-size: 0.8rem; color: var(--primary); margin-top: 0.5rem;"><i class="fa-solid fa-scale-balanced"></i> Zdroj: ${t.source_law}</p>` : '';
+
             taskDiv.innerHTML = `
                 <div>
-                    <h4 style="margin-bottom: 0.3rem; font-size: 1.1rem; color: ${t.is_completed ? 'var(--text-muted)' : 'white'};">${t.title}</h4>
+                    <h4 style="margin-bottom: 0.3rem; font-size: 1.1rem; color: ${t.is_completed ? 'var(--text-muted)' : 'white'};">${t.title} ${aiBadge}</h4>
                     <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">${t.description}</p>
                     <span class="deadline" style="background: ${t.is_completed ? 'rgba(255,255,255,0.05)' : ''}"><i class="fa-regular fa-clock"></i> ${t.deadline}</span>
+                    ${sourceInfo}
                 </div>
                 <div class="task-action">
                     ${actionHtml}

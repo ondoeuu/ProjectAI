@@ -59,6 +59,8 @@ class DBTask(Base):
     deadline = Column(String)
     is_completed = Column(Boolean, default=False)
     can_automate = Column(Boolean, default=False)
+    ai_detected = Column(Boolean, default=False)
+    source_law = Column(String, default="")
     
     company = relationship("DBCompany", back_populates="tasks")
 
@@ -80,10 +82,14 @@ class Duty(BaseModel):
     description: str
     deadline: str
     is_immediate: bool = False
+    ai_detected: bool = False
+    source_law: str = ""
 
 class Requirement(BaseModel):
     title: str
     description: str
+    ai_detected: bool = False
+    source_law: str = ""
 
 class Proposal(BaseModel):
     founder_id: str
@@ -165,6 +171,15 @@ def lookup_registry(query: dict) -> dict:
         return {"found": True, "address": "Dlouhá 15, Praha", "birth_date": "1990-01-01"}
     elif query.get("type") == "company_name":
         name = query.get("name")
+        
+        # 1. Kontrola v lokální DB, zda už firmu nespravujeme
+        db = SessionLocal()
+        existing_company = db.query(DBCompany).filter(DBCompany.name.ilike(name)).first()
+        db.close()
+        if existing_company:
+            return {"available": False}
+            
+        # 2. Kontrola vůči reálnému ARES
         try:
             resp = requests.post(
                 "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/vyhledat",
@@ -243,14 +258,18 @@ class TierOneAgent:
             proposal.requirements.append(
                 Requirement(
                     title="Doložení odborné způsobilosti", 
-                    description=f"Pro obor '{intent.business_area}' legislativa vyžaduje doložení praxe nebo vzdělání. Důvod: {leg_info}"
+                    description=f"Pro obor '{intent.business_area}' legislativa vyžaduje doložení praxe nebo vzdělání. Důvod: {leg_info}",
+                    ai_detected=True,
+                    source_law="Živnostenský zákon § 21"
                 )
             )
         else:
             proposal.requirements.append(
                 Requirement(
                     title="Ohlášení volné živnosti", 
-                    description=f"Pro obor '{intent.business_area}' není vyžadována koncese. Postačuje ohlášení."
+                    description=f"Pro obor '{intent.business_area}' není vyžadována koncese. Postačuje ohlášení.",
+                    ai_detected=False,
+                    source_law="Živnostenský zákon § 25"
                 )
             )
 
@@ -259,13 +278,17 @@ class TierOneAgent:
                 title="Registrace k dani z příjmů (DPPO)",
                 description="Povinná registrace do 15 dnů od vzniku.",
                 deadline=(datetime.now() + timedelta(days=15)).strftime("%Y-%m-%d"),
-                is_immediate=True
+                is_immediate=True,
+                ai_detected=True,
+                source_law="Zákon o daních z příjmů § 39"
             ),
             Duty(
                 title="Zápis do evidence skutečných majitelů (ESM)",
                 description="Návrh na zápis musí být podán bez zbytečného odkladu.",
                 deadline="Bez zbytečného odkladu",
-                is_immediate=True
+                is_immediate=True,
+                ai_detected=False,
+                source_law="Zákon o ESM § 9"
             )
         ])
         
@@ -286,12 +309,16 @@ class TierOneAgent:
             Duty(
                 title="Podání daňového přiznání (DPPO)",
                 description="Elektronické podání přiznání.",
-                deadline=f"{current_year + 1}-05-02"
+                deadline=f"{current_year + 1}-05-02",
+                ai_detected=False,
+                source_law="Daňový řád § 136"
             ),
             Duty(
                 title="Založení účetní závěrky do sbírky listin",
                 description="Zveřejnění účetní závěrky v OR.",
-                deadline=f"{current_year + 1}-07-31" 
+                deadline=f"{current_year + 1}-07-31",
+                ai_detected=False,
+                source_law="Zákon o účetnictví § 21a"
             )
         ]
 
@@ -393,7 +420,9 @@ def api_create_company(proposal: dict):
             description=duty.get("description"),
             deadline=duty.get("deadline"),
             is_completed=False,
-            can_automate=True # Okamžité umí agent automatizovat
+            can_automate=True, # Okamžité umí agent automatizovat
+            ai_detected=duty.get("ai_detected", False),
+            source_law=duty.get("source_law", "")
         ))
     for duty in proposal.get("scheduled_duties", []):
         db.add(DBTask(
@@ -402,7 +431,9 @@ def api_create_company(proposal: dict):
             description=duty.get("description"),
             deadline=duty.get("deadline"),
             is_completed=False,
-            can_automate=False # Dlouhodobé zatím ne
+            can_automate=False, # Dlouhodobé zatím ne
+            ai_detected=duty.get("ai_detected", False),
+            source_law=duty.get("source_law", "")
         ))
     
     db.commit()
@@ -429,7 +460,9 @@ def api_get_company(company_id: int):
             "description": t.description,
             "deadline": t.deadline,
             "is_completed": t.is_completed,
-            "can_automate": t.can_automate
+            "can_automate": t.can_automate,
+            "ai_detected": t.ai_detected,
+            "source_law": t.source_law
         })
         
     res = {
@@ -481,4 +514,4 @@ app.mount("/", StaticFiles(directory=".", html=True), name="static")
 
 if __name__ == "__main__":
     print("Startuji FastAPI server s DB...")
-    uvicorn.run(app, host="0.0.0.0", port=8092)
+    uvicorn.run(app, host="0.0.0.0", port=8093)
