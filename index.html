@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI eGov Agent | Snadné založení firmy</title>
+    <meta name="description" content="Inteligentní agent pro zakládání firem a sledování zákonných povinností v České republice.">
     <!-- Modern Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,8 +23,21 @@
     <main class="app-container">
         <!-- Logo Header -->
         <header class="app-header fade-in">
-            <div class="logo">
-                <i class="fa-solid fa-layer-group"></i> eGov AI Agent
+            <div class="header-row">
+                <div class="logo">
+                    <i class="fa-solid fa-layer-group"></i> eGov AI Agent
+                </div>
+                <nav class="header-nav" id="header-nav" style="display: none;">
+                    <button class="nav-btn active" data-target="dashboard-main" id="nav-dashboard">
+                        <i class="fa-solid fa-gauge-high"></i> Dashboard
+                    </button>
+                    <button class="nav-btn" data-target="dashboard-monitoring" id="nav-monitoring">
+                        <i class="fa-solid fa-satellite-dish"></i> Monitoring
+                    </button>
+                    <button class="nav-btn" data-target="dashboard-limits" id="nav-limits">
+                        <i class="fa-solid fa-shield-halved"></i> Limity
+                    </button>
+                </nav>
             </div>
         </header>
 
@@ -75,8 +89,10 @@
                 <ul class="processing-steps">
                     <li id="proc-1" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Hledám v Registru obyvatel...</li>
                     <li id="proc-2" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Ověřuji dostupnost názvu v ARES...</li>
-                    <li id="proc-3" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzuji platnou legislativu pro vybraný obor...</li>
-                    <li id="proc-4" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Generuji podklad k založení a seznam povinností...</li>
+                    <li id="proc-3" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Kontroluji Registr DPH a ISIR...</li>
+                    <li id="proc-4" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Analyzuji platnou legislativu (e-Sbírka)...</li>
+                    <li id="proc-5" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Ověřuji VIES a datové schránky...</li>
+                    <li id="proc-6" class="proc-step pending"><i class="fa-solid fa-circle-notch fa-spin"></i> Generuji podklad a seznam povinností...</li>
                 </ul>
             </div>
         </section>
@@ -122,18 +138,69 @@
             </div>
         </section>
         
-        <!-- Zpráva o úspěchu -->
-        <section id="step-success" class="step hidden">
-            <div class="glass-card text-center success-card slide-up">
-                <div class="success-icon-wrapper">
-                    <i class="fa-solid fa-check"></i>
+        <!-- KROK 5: Dashboard (Monitoring po založení) -->
+        <section id="step-dashboard" class="step hidden">
+            <div class="dashboard-wrapper slide-up">
+                
+                <!-- Dashboard Header -->
+                <div class="dashboard-hero glass-card">
+                    <div class="dashboard-hero-content">
+                        <div class="dashboard-hero-left">
+                            <div class="company-badge">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                            <div>
+                                <h1 id="dash-company-name">Inovace s.r.o.</h1>
+                                <p class="dash-ico">IČO: <span id="dash-ico">12345678</span></p>
+                            </div>
+                        </div>
+                        <div class="dashboard-hero-right">
+                            <div class="stat-pill">
+                                <i class="fa-solid fa-satellite-dish"></i>
+                                <span><strong>7</strong> sledovaných registrů</span>
+                            </div>
+                            <div class="stat-pill alerts" id="dash-alerts-pill">
+                                <i class="fa-solid fa-bell"></i>
+                                <span><strong id="dash-alerts-count">0</strong> upozornění</span>
+                            </div>
+                            <div class="stat-pill">
+                                <i class="fa-solid fa-clock"></i>
+                                <span>Scan: <span id="dash-last-scan">--</span></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h1 class="title">Úspěšně odesláno!</h1>
-                <p class="subtitle">Váš návrh byl podán na příslušné úřady. Náš agent automaticky naplánoval dlouhodobé povinnosti do vašeho kalendáře.</p>
-                <div class="scheduled-duties" id="success-scheduled">
-                    <!-- Dynamic tasks -->
+
+                <!-- Zákonné Limity -->
+                <div class="dashboard-section" id="dashboard-limits">
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Klíčové zákonné limity
+                        <span class="section-subtitle">Automatické hlídání dle platné legislativy</span>
+                    </h2>
+                    <div class="limits-grid" id="dash-limits">
+                        <!-- Dynamic content -->
+                    </div>
                 </div>
-                <button class="primary-btn mt-2" onclick="location.reload()"><i class="fa-solid fa-house"></i> Zpět na úvod</button>
+
+                <!-- Monitoring Registrů -->
+                <div class="dashboard-section" id="dashboard-monitoring">
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-satellite-dish"></i>
+                        Monitoring oficiálních registrů
+                        <span class="section-subtitle">Průběžné sledování 7 klíčových zdrojů</span>
+                    </h2>
+                    <div class="monitoring-grid" id="dash-monitoring">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Footer s odkazy -->
+                <div class="dashboard-footer glass-card">
+                    <p><i class="fa-solid fa-robot"></i> AI Agent průběžně monitoruje všechny registry a upozorní vás na změny. Další kontrola za <strong>24 hodin</strong>.</p>
+                    <button class="primary-btn" onclick="location.reload()"><i class="fa-solid fa-house"></i> Zpět na úvod</button>
+                </div>
+
             </div>
         </section>
 
