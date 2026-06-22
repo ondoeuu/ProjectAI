@@ -41,14 +41,39 @@
             </div>
         </header>
 
-        <!-- KROK 1: Identifikace (BankID Mock) -->
-        <section id="step-identity" class="step active slide-up">
-            <div class="glass-card text-center identity-card">
-                <h1 class="title">Založte firmu<br>bez byrokracie</h1>
-                <p class="subtitle">Přihlaste se a nechte AI vyřídit papírování za vás. Princip <i>once-only</i> v praxi.</p>
+        <!-- KROK 0: Landing Page (Nová úvodní stránka) -->
+        <section id="step-landing" class="step active slide-up">
+            <div class="glass-card text-center landing-card">
+                <h1 class="title">Správa firem a byrokracie<br>řízená umělou inteligencí</h1>
+                <p class="subtitle">Založte firmu jednou větou. Nechte AI hlídat registry, limity a plnit zákonné povinnosti za vás.</p>
+                
+                <div class="features-preview" style="display: flex; justify-content: center; gap: 2rem; margin-bottom: 3rem; color: var(--text-muted);">
+                    <div><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Založení bez formulářů</div>
+                    <div><i class="fa-solid fa-satellite-dish" style="color: var(--accent);"></i> 24/7 Monitoring registrů</div>
+                    <div><i class="fa-solid fa-robot" style="color: var(--success);"></i> Automatické vyřizování agendy</div>
+                </div>
+
                 <button id="btn-login" class="primary-btn pulse-anim">
-                    <i class="fa-solid fa-fingerprint"></i> Přihlásit přes Bankovní Identitu
+                    <i class="fa-solid fa-fingerprint"></i> Přihlásit se do portálu (BankID)
                 </button>
+            </div>
+        </section>
+
+        <!-- KROK 0.5: Klientský Portál (Seznam firem) -->
+        <section id="step-portal" class="step hidden">
+            <div class="portal-wrapper slide-up" style="width: 100%; max-width: 1000px;">
+                <div class="portal-header" style="margin-bottom: 2rem;">
+                    <h2><i class="fa-solid fa-user-check" style="color: var(--primary);"></i> Vítejte v portálu, <span id="portal-user-name">Jane</span>.</h2>
+                    <p style="color: var(--text-muted);">Spravujte své firmy a nechte agendu na nás.</p>
+                </div>
+                
+                <div id="portal-companies" class="companies-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <!-- Dynamické karty firem z DB -->
+                </div>
+
+                <div class="text-center" style="margin-top: 3rem;">
+                    <button id="btn-new-company" class="primary-btn"><i class="fa-solid fa-plus"></i> Založit novou firmu</button>
+                </div>
             </div>
         </section>
 
@@ -110,9 +135,14 @@
                         <h3><i class="fa-solid fa-building"></i> Základní údaje</h3>
                         <ul>
                             <li><strong>Zakladatel:</strong> Jan Novák</li>
-                            <li><strong>Název firmy:</strong> <span id="prop-company-name">Inovace s.r.o.</span></li>
+                            <li><strong>Název firmy:</strong> 
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <input type="text" id="prop-company-name-input" class="modern-input" style="width: 250px; padding: 0.2rem 0.5rem; font-size: 1rem;">
+                                    <button id="btn-recheck-name" class="submit-btn" style="width: auto; padding: 0.2rem 0.8rem; border-radius: 5px; font-size: 0.9rem;">Ověřit</button>
+                                </div>
+                            </li>
                             <li><strong>Obor:</strong> <span id="prop-business-area">Vývoj software</span></li>
-                            <li><strong>Dostupnost názvu:</strong> <span class="badge success">Volné</span></li>
+                            <li><strong>Dostupnost názvu:</strong> <span id="prop-name-status" class="badge success">Volné</span></li>
                         </ul>
                     </div>
 
@@ -168,6 +198,18 @@
                                 <span>Scan: <span id="dash-last-scan">--</span></span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Přehled firemních úkolů z DB -->
+                <div class="dashboard-section" id="dashboard-tasks" style="margin-bottom: 2.5rem;">
+                    <h2 class="section-title">
+                        <i class="fa-solid fa-list-check"></i>
+                        Agenda a povinnosti
+                        <span class="section-subtitle">Chytrá automatizace s vaším souhlasem</span>
+                    </h2>
+                    <div id="dash-tasks-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Sem se vykreslí tasky -->
                     </div>
                 </div>
 
